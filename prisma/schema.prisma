@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderState {
+  APPROVAL_PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TicketState {
+  CREATE_PENDING
+  AWAITING_ACCEPTANCE
+  CREATE_REJECTED
+}
+
+enum AuthorizationState {
+  PENDING
+  AUTHORIZED
+  FAILED
+}
+
+model Consumer {
+  id        String   @id @default(uuid())
+  name      String
+  creditLimit Float  @default(1000)
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id          String     @id @default(uuid())
+  consumerId  String
+  amount      Float
+  state       OrderState @default(APPROVAL_PENDING)
+  sagaType    String     @default("choreography")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Ticket {
+  id          String      @id @default(uuid())
+  orderId     String
+  description String
+  state       TicketState @default(CREATE_PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model CreditCardAuthorization {
+  id          String             @id @default(uuid())
+  orderId     String
+  consumerId  String
+  amount      Float
+  state       AuthorizationState @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
